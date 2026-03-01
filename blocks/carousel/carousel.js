@@ -15,33 +15,42 @@ export default function decorate(block) {
       slide.append(row.firstElementChild);
     }
 
+    [...slide.children].forEach((div) => {
+      if (div.querySelector('picture')) {
+        div.className = 'carousel-image';
+      } else {
+        div.className = 'carousel-content';
+      }
+    });
+
     track.append(slide);
   });
 
   const prevBtn = document.createElement('button');
   prevBtn.className = 'carousel-btn prev';
-  prevBtn.textContent = '‹';
+  prevBtn.innerHTML = '❮';
 
   const nextBtn = document.createElement('button');
   nextBtn.className = 'carousel-btn next';
-  nextBtn.textContent = '›';
+  nextBtn.innerHTML = '❯';
 
   wrapper.append(prevBtn, track, nextBtn);
   block.replaceChildren(wrapper);
 
-  let currentIndex = 0;
+  let index = 0;
+  const totalSlides = track.children.length;
 
-  function updateSlide() {
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
+  function updateCarousel() {
+    track.style.transform = `translateX(-${index * 100}%)`;
   }
 
   nextBtn.addEventListener('click', () => {
-    currentIndex = (currentIndex + 1) % slides.length;
-    updateSlide();
+    index = (index + 1) % totalSlides;
+    updateCarousel();
   });
 
   prevBtn.addEventListener('click', () => {
-    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-    updateSlide();
+    index = (index - 1 + totalSlides) % totalSlides;
+    updateCarousel();
   });
 }
