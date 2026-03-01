@@ -1,40 +1,54 @@
+/* Grid Layout */
 .cards > ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
 }
 
+/* Card Box */
 .cards > ul > li {
+  background-color: #ffffff;
   border-radius: 12px;
   overflow: hidden;
-  background-color: #ffffff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .cards > ul > li:hover {
   transform: translateY(-6px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
 }
 
-.cards .cards-card-body {
-  padding: 16px;
-  font-size: 14px;
-  color: #333;
-}
-
-.cards .cards-card-body strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 16px;
-  color: #000;
-}
-
+/* Image */
 .cards .cards-card-image img {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+}
+
+/* Card Content */
+.cards .cards-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+}
+
+/* Product Name */
+.cards .cards-card-body strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Price */
+.cards .cards-card-body p:last-child {
+  font-size: 16px;
+  font-weight: 600;
+  color:#000;
 }
