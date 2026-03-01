@@ -1,18 +1,42 @@
 .accordion-title {
   width: 100%;
   text-align: left;
-  padding: 12px;
+  padding: 16px 20px;
   font-size: 16px;
+  font-weight: 600;
+  color: #222;              /* Dark question text */
+  background-color: #f3f3f3; /* Light gray background */
   border: none;
-  background: #f5f5f5;
+  border-radius: 6px;
   cursor: pointer;
+  margin-bottom: 6px;
+  position: relative;
+  transition: background 0.3s ease;
 }
 
 .accordion-title:hover {
-  background: #e0e0e0;
+  background-color: #e6e6e6;
+}
+
+/* Down Arrow */
+.accordion-title::after {
+  content: "▼";
+  position: absolute;
+  right: 20px;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+/* Rotate arrow when active */
+.accordion-title.active::after {
+  transform: rotate(180deg);
 }
 
 .accordion-content {
-  padding: 12px;
-  border: 1px solid #ddd;
+  padding: 15px 20px;
+  background-color: #ffffff;
+  border-left: 3px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  display: none;
 }

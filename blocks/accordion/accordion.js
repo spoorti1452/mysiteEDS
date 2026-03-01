@@ -12,11 +12,12 @@ export default function decorate(block) {
     const body = document.createElement('div');
     body.className = 'accordion-content';
     body.innerHTML = content.innerHTML;
-    body.style.display = 'none';
 
     button.addEventListener('click', () => {
       const isOpen = body.style.display === 'block';
+
       body.style.display = isOpen ? 'none' : 'block';
+      button.classList.toggle('active');
     });
 
     row.innerHTML = '';

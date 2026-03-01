@@ -1,0 +1,32 @@
+.breadcrumbs-nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.breadcrumbs-nav li::after {
+  content: ">";
+  margin-left: 8px;
+  color: #999;
+}
+
+.breadcrumbs-nav li:last-child::after {
+  content: "";
+}
+
+.breadcrumbs-nav a {
+  text-decoration: none;
+  color: #555;
+}
+
+.breadcrumbs-nav a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs-nav a.active {
+  font-weight: 600;
+  color: #000;
+  pointer-events: none;
+}
