@@ -1,28 +1,119 @@
-.form form {
-  max-width: 500px;
-  margin: 40px auto;
+/* Scope to the block (both ".form.block" and ".block.form" just in case) */
+.form.block form,
+.block.form form {
+  max-width: 520px;
+  margin: 32px auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
+  font: inherit;
 }
 
-.form input,
-.form textarea {
-  padding: 10px;
+/* Field wrapper */
+.form.block .form-field,
+.block.form .form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels */
+.form.block .form-field label,
+.block.form .form-field label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Inputs & Textarea */
+.form.block input[type="text"],
+.form.block input[type="email"],
+.form.block input[type="number"],
+.form.block input[type="tel"],
+.form.block input[type="url"],
+.form.block input[type="date"],
+.form.block input[type="password"],
+.form.block input[type="search"],
+.form.block input[type="file"],
+.form.block input[type="color"],
+.form.block input[type="range"],
+.form.block textarea,
+.block.form input[type="text"],
+.block.form input[type="email"],
+.block.form input[type="number"],
+.block.form input[type="tel"],
+.block.form input[type="url"],
+.block.form input[type="date"],
+.block.form input[type="password"],
+.block.form input[type="search"],
+.block.form input[type="file"],
+.block.form input[type="color"],
+.block.form input[type="range"],
+.block.form textarea {
+  padding: 10px 12px;
   font-size: 14px;
-  border: 1px solid #ccc;
+  border: 1px solid #d0d0d0;
   border-radius: 6px;
+  background: #fff;
+  color: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
 }
 
-.form button {
-  padding: 10px;
-  background: black;
-  color: white;
+/* Focus */
+.form.block input:focus,
+.form.block textarea:focus,
+.block.form input:focus,
+.block.form textarea:focus {
+  border-color: #6b6bff;
+  box-shadow: 0 0 0 3px rgba(107, 107, 255, 0.15);
+}
+
+/* Checkbox / Radio inline */
+.form.block .form-field.is-checkbox,
+.form.block .form-field.is-radio,
+.block.form .form-field.is-checkbox,
+.block.form .form-field.is-radio {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.form.block .form-field.is-checkbox label,
+.form.block .form-field.is-radio label,
+.block.form .form-field.is-checkbox label,
+.block.form .form-field.is-radio label {
+  margin: 0;
+}
+
+/* Submit button */
+.form.block .form-submit,
+.block.form .form-submit {
+  padding: 10px 14px;
+  background: #000;
+  color: #fff;
   border: none;
-  cursor: pointer;
   border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  align-self: start;
+  transition: background 0.15s ease, transform 0.06s ease;
 }
 
-.form button:hover {
+.form.block .form-submit:hover,
+.block.form .form-submit:hover {
   background: #444;
+}
+
+.form.block .form-submit:active,
+.block.form .form-submit:active {
+  transform: translateY(1px);
+}
+
+/* Mobile spacing */
+@media (max-width: 480px) {
+  .form.block form,
+  .block.form form {
+    margin: 24px 16px;
+  }
 }
