@@ -255,5 +255,27 @@ main .section.highlight {
   margin: 0;
   padding: 40px 0;
 }
-
-
+.default-content-wrapper #heading1{
+  color: brown;
+}
+.default-content-wrapper #heading2{
+  color: darkorchid;
+}
+#heading3{
+  color: burlywood;
+}
+#heading4{
+  color:chartreuse;
+}
+#heading-5{
+  color:chocolate;
+}
+main .section .default-content-wrapper p{
+  color: brown;
+}
+ul{
+  color: cadetblue;
+}
+ol{
+  color: chocolate;
+}
