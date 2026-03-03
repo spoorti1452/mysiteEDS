@@ -1,42 +1,34 @@
 export default function decorate(block) {
+  if (block.children.length < 2) return;
+
+  const titleRow = block.children[0];
+  const contentRow = block.children[1];
+
   const wrapper = document.createElement('div');
   wrapper.className = 'hero-wrapper';
 
-  [...block.children].forEach((row) => {
-    if (!row.textContent.trim()) return;
+  // Title
+  const h1 = document.createElement('h1');
+  h1.className = 'hero-title';
+  h1.textContent = titleRow.textContent.trim();
+  wrapper.append(h1);
 
-    const div = document.createElement('div');
-    div.className = 'hero-content';
+  // Image
+  const img = contentRow.querySelector('img');
+  if (img) {
+    img.className = 'hero-image';
+    wrapper.append(img);
+  }
 
-    const text = row.textContent.trim();
+  // Overlay text
+  const text = contentRow.textContent.replace(img?.alt || '', '').trim();
+  if (text) {
+    const overlay = document.createElement('div');
+    overlay.className = 'hero-text-overlay';
+    overlay.textContent = text;
+    wrapper.append(overlay);
+  }
 
-    // Simple detection
-    if (row.querySelector('img')) {
-      const img = row.querySelector('img');
-      div.className = 'hero-image';
-      div.append(img);
-    } else if (text.toLowerCase().includes('→')) {
-      const link = document.createElement('a');
-      const parts = text.split('→');
-      link.href = parts[1].trim();
-      link.textContent = parts[0].trim();
-      link.className = 'hero-cta';
-      div.append(link);
-    } else if (!wrapper.querySelector('.hero-title')) {
-      const h1 = document.createElement('h1');
-      h1.className = 'hero-title';
-      h1.textContent = text;
-      div.append(h1);
-    } else {
-      const p = document.createElement('p');
-      p.className = 'hero-subtitle';
-      p.textContent = text;
-      div.append(p);
-    }
-
-    wrapper.append(div);
-  });
-
-  block.innerHTML = '';
+  block.textContent = '';
   block.append(wrapper);
 }

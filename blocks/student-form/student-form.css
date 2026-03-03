@@ -1,0 +1,54 @@
+.student-form {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.student-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #ffffff;
+  padding: 2rem;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+}
+
+.student-form .field-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-form label {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.student-form label.required::after {
+  content: " *";
+  color: #d7373f;
+}
+
+.student-form input, 
+.student-form select {
+  padding: 0.75rem;
+  border: 1px solid #bcbcbc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.student-form button {
+  background-color: #0265dc;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.student-form button:hover {
+  background-color: #014da8;
+}

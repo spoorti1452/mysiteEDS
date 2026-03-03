@@ -1,0 +1,82 @@
+/* Wrapper */
+.tabs-wrapper {
+  width: 100%;
+  margin: 16px 0;
+}
+
+/* Tab strip */
+.tab-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  border-bottom: 1px solid #d4d4d4; /* line extending after the last tab */
+}
+
+/* Square tab button */
+.tab-btn {
+  appearance: none;
+  cursor: pointer;
+  border: 1px solid #c9c9c9;
+  border-bottom: none;                  /* merges with the panel border */
+  background: #efefef;                  /* neutral gray */
+  color: #141414;
+  font-weight: 700;
+  padding: 10px 14px;
+  line-height: 1.2;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  /* square style: no radius */
+  border-radius: 0;
+}
+
+.tab-btn:hover {
+  background: #e6e6e6;
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid #005fcc;
+  outline-offset: 2px;
+}
+
+/* Active tab: white, square, with a bold top border */
+.tab-btn.active,
+.tab-btn[aria-selected="true"] {
+  background: #ffffff;
+  color: #111;
+  border-top: 2px solid #000;           /* black top edge */
+  border-left-color: #bfbfbf;
+  border-right-color: #bfbfbf;
+  border-bottom: none;
+  /* no radius, stays square */
+}
+
+/* Panel wrapper (big rectangle under tabs) */
+.tab-contents {
+  border: 1px solid #c9c9c9;
+  background: #ffffff;
+  margin-top: -1px;                     /* stitches borders together */
+  /* square corners */
+  border-radius: 0;
+}
+
+/* Individual panel */
+.tab-content {
+  padding: 16px;
+}
+
+.tab-content[hidden] {
+  display: none !important;
+}
+
+/* Optional: compact spacing on small screens */
+@media (max-width: 640px) {
+  .tab-buttons {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .tab-btn {
+    padding: 8px 12px;
+  }
+  .tab-content {
+    padding: 12px;
+  }
+}
