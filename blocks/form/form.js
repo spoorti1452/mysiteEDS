@@ -1,137 +1,103 @@
-/**
- * Form block for da.live (Edge Delivery Services / Franklin)
- *
- * Authoring format (4 columns):
- * Label | Name | Type | Required
- * Example rows:
- * Name   | name   | text   | true
- * Email  | email  | email  | true
- * Submit | submit | submit |
- *
- * Notes:
- * - da.live converts tables to a div-grid: block > row(div) > cell(div) > p/strong
- * - This decorator supports both div-grid and real tables.
- * - Required accepts true/yes/1 (case-insensitive).
- * - Supports textarea and common input types; unknown types fall back to text.
- */
-export default function decorate(block) {
-  console.log('Decorating form block (da.live)', block); // Keep this while debugging
+export default async function decorate(block) {
+  const link = block.querySelector('a');
+  if (!link) return;
 
-  const form = document.createElement('form');
-  form.setAttribute('novalidate', '');
+  try {
+    const response = await fetch(link.href);
+    const data = await response.json();
+    const fields = data.data || data;
 
-  // ---- helpers -------------------------------------------------------------
+    const form = document.createElement('form');
+    form.classList.add('dynamic-form');
 
-  const text = (el) => (el?.textContent || '').trim();
-  const isTrue = (v) => /^(true|yes|1)$/i.test((v || '').trim());
-  const normalizeType = (t) => {
-    const raw = (t || '').toLowerCase();
-    if (raw === 'message') return 'textarea'; // legacy alias
-    return raw || 'text';
-  };
+    // Build the form fields from info sheet
+    fields.forEach((field) => {
+      if (!field.Type) return;
 
-  const buildField = ({ labelText, nameText, type, required }) => {
-    // Submit row
-    if (type === 'submit') {
-      const btn = document.createElement('button');
-      btn.type = 'submit';
-      btn.textContent = labelText || 'Submit';
-      btn.className = 'form-submit';
-      form.append(btn);
-      return;
-    }
-
-    const field = document.createElement('div');
-    field.className = 'form-field';
-
-    const safeName = (nameText || labelText || 'field')
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9\-]/g, '');
-
-    const id = `form-${safeName}-${Math.random().toString(36).slice(2, 7)}`;
-
-    let control;
-
-    if (type === 'textarea') {
-      control = document.createElement('textarea');
-      control.rows = 4;
-    } else {
-      const valid = new Set([
-        'text', 'email', 'number', 'tel', 'url',
-        'date', 'password', 'search', 'checkbox',
-        'radio', 'file', 'color', 'range', 'hidden',
-      ]);
-      control = document.createElement('input');
-      control.type = valid.has(type) ? type : 'text';
-    }
-
-    control.name = safeName;
-    control.id = id;
-    if (required) control.required = true;
-
-    const label = document.createElement('label');
-    label.setAttribute('for', id);
-    label.textContent = labelText || safeName;
-
-    if (control.type === 'checkbox' || control.type === 'radio') {
-      field.classList.add(`is-${control.type}`);
-      field.append(control, label);
-    } else {
-      field.append(label, control);
-    }
-
-    form.append(field);
-  };
-
-  // ---- parse authored content ---------------------------------------------
-
-  // First try the da.live div-grid format
-  const rowDivs = [...block.children].filter((el) => el.tagName === 'DIV');
-
-  const looksLikeDivGrid =
-    rowDivs.length &&
-    [...rowDivs[0].children].every((cell) => cell.tagName === 'DIV');
-
-  if (looksLikeDivGrid) {
-    rowDivs.forEach((row, idx) => {
-      // Header row usually contains <strong> in the first cell
-      if (idx === 0) {
-        const firstCell = row.querySelector(':scope > div');
-        const isHeader = !!firstCell?.querySelector('strong');
-        if (isHeader) return; // skip header
+      if (field.Type.toLowerCase() === 'submit') {
+        const button = document.createElement('button');
+        button.type = 'submit';
+        button.textContent = field.Label;
+        button.classList.add('form-submit-btn');
+        form.appendChild(button);
+        return;
       }
 
-      const cells = [...row.children].filter((el) => el.tagName === 'DIV');
-      if (cells.length < 3) return;
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('form-group');
 
-      const labelText = text(cells[0]);
-      const nameText  = text(cells[1]);
-      const type      = normalizeType(text(cells[2]));
-      const required  = cells[3] ? isTrue(text(cells[3])) : false;
+      const label = document.createElement('label');
+      label.textContent = field.Label;
 
-      buildField({ labelText, nameText, type, required });
+      let input;
+      const type = field.Type.toLowerCase();
+      if (type === 'message') {
+        input = document.createElement('textarea');
+      } else {
+        input = document.createElement('input');
+        input.type = (type === 'mobile') ? 'tel' : (type === 'number' ? 'number' : 'text');
+      }
+
+      input.name = field.Name; // Matches Google Sheet Headers
+      input.placeholder = field.placeholder || '';
+      input.required = true;
+
+      wrapper.appendChild(label);
+      wrapper.appendChild(input);
+      form.appendChild(wrapper);
     });
-  } else {
-    // Fallback: real table (rare in da.live, but safe to support)
-    const trs = block.querySelectorAll('tr');
-    trs.forEach((tr, idx) => {
-      const ths = tr.querySelectorAll('th');
-      if (ths.length) return; // header
 
-      const tds = tr.querySelectorAll('td');
-      if (tds.length < 3) return;
+    // Handle Form Submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-      const labelText = text(tds[0]);
-      const nameText  = text(tds[1]);
-      const type      = normalizeType(text(tds[2]));
-      const required  = tds[3] ? isTrue(text(tds[3])) : false;
+      const formData = new FormData(form);
+      const jsonData = Object.fromEntries(formData.entries());
+      const submitBtn = form.querySelector('button[type="submit"]');
+      
+      // Disable button during submission
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting...';
 
-      buildField({ labelText, nameText, type, required });
+      try {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwkoWf2rufULoukcIFF1bEsBbLeR_zKIiF1zR6Alrsw4ycAKGvJn-n88LPonj6m63pW/exec';
+
+        await fetch(scriptURL, {
+          method: 'POST',
+          mode: 'no-cors', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonData),
+        });
+
+        // 1. Reset the form fields
+        form.reset();
+
+        // 2. Clear old success messages
+        const oldMsg = form.querySelector('.success-msg');
+        if (oldMsg) oldMsg.remove();
+
+        // 3. Add new success message below the button
+        const message = document.createElement('p');
+        message.classList.add('success-msg');
+        message.textContent = 'Form Submitted Successfully';
+        message.style.cssText = 'color: green; font-weight: bold; margin-top: 15px; text-align: center;';
+        
+        form.appendChild(message);
+
+      } catch (error) {
+        console.error('Error!', error);
+        alert('Submission Failed. Please try again.');
+      } finally {
+        // Re-enable button
+        submitBtn.disabled = false;
+        submitBtn.textContent = fields.find(f => f.Type.toLowerCase() === 'submit').Label;
+      }
     });
+
+    block.innerHTML = '';
+    block.appendChild(form);
+
+  } catch (error) {
+    console.error('Error loading form:', error);
   }
-
-  // Replace the authored grid/table with the real form
-  block.textContent = '';
-  block.append(form);
 }

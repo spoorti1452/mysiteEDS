@@ -1,81 +1,46 @@
-/**
- * Student Form Block
- * Fetches structure from an AEM Sheet (da.live) and submits to the 'incoming' tab.
- */
 export default async function decorate(block) {
-  // 1. Extract the link to the JSON from the block table
   const link = block.querySelector('a');
-  if (!link) {
-    block.textContent = 'Error: No link to the spreadsheet found.';
-    return;
-  }
+  if (!link) return;
 
   const jsonUrl = link.href;
 
   try {
     const resp = await fetch(jsonUrl);
-    if (!resp.ok) throw new Error('Failed to fetch form JSON');
+    if (!resp.ok) return;
     
     const json = await resp.json();
-
-    // 2. Determine where the data is. 
-    // In da.live tabs, it's usually json.form.data. If flat, it's json.data.
     const fields = json.form ? json.form.data : json.data;
     
-    if (!fields || fields.length === 0) {
-      block.textContent = 'Error: Form structure is empty.';
-      return;
-    }
+    if (!fields) return;
 
-    // 3. Create the Form element
     const form = document.createElement('form');
     form.className = 'student-registration-form';
     
-    // The action URL for submission is the spreadsheet URL without .json
-    const actionUrl = jsonUrl.split('.json')[0];
+    // CRITICAL: We must submit to the .live URL for POST to work
+    // We remove .json and ensure the domain is .live
+    const actionUrl = jsonUrl.replace('.page', '.live').split('.json')[0];
 
-    // 4. Loop through fields from the 'form' sheet to build HTML
     fields.forEach((field) => {
       const fieldType = field.Type?.toLowerCase();
-      const fieldName = field.Field;
-      const fieldLabel = field.Label;
-      const isMandatory = field.Mandatory === 'true';
-
-      // Create a wrapper for each field
-      const fieldWrapper = document.createElement('div');
-      fieldWrapper.className = 'field-wrapper';
-
-      // Handle Submit Button separately
       if (fieldType === 'submit') {
         const button = document.createElement('button');
         button.type = 'submit';
-        button.className = 'button primary';
-        button.textContent = fieldLabel || 'Submit';
+        button.textContent = field.Label || 'Submit';
         form.append(button);
         return;
       }
 
-      // Create Label
+      const wrapper = document.createElement('div');
+      wrapper.className = 'field-wrapper';
+      
       const label = document.createElement('label');
-      label.setAttribute('for', fieldName);
-      label.textContent = fieldLabel;
-      if (isMandatory) label.classList.add('required');
-      fieldWrapper.append(label);
-
+      label.textContent = field.Label;
+      label.setAttribute('for', field.Field);
+      
       let input;
       if (fieldType === 'select') {
-        // Create Dropdown
         input = document.createElement('select');
         const options = field.Options ? field.Options.split(',') : [];
-        
-        // Add a default placeholder
-        const placeholder = document.createElement('option');
-        placeholder.value = '';
-        placeholder.textContent = 'Select an option...';
-        placeholder.disabled = true;
-        placeholder.selected = true;
-        input.append(placeholder);
-
         options.forEach((opt) => {
           const option = document.createElement('option');
           option.value = opt.trim();
@@ -83,56 +48,54 @@ export default async function decorate(block) {
           input.append(option);
         });
       } else {
-        // Create Text/Email/Number inputs
         input = document.createElement('input');
         input.type = fieldType || 'text';
       }
 
-      input.id = fieldName;
-      input.name = fieldName;
-      if (isMandatory) input.required = true;
+      input.id = field.Field;
+      input.name = field.Field;
+      if (field.Mandatory === 'true') input.required = true;
 
-      fieldWrapper.append(input);
-      form.append(fieldWrapper);
+      wrapper.append(label, input);
+      form.append(wrapper);
     });
 
-    // 5. Handle Form Submission
+    // Handle Submission
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // Collect data into the format AEM Sheets expects
       const formData = new FormData(form);
-      const payload = {};
-      
+      const data = {};
       formData.forEach((value, key) => {
-        payload[key] = value;
+        data[key] = value;
       });
 
-      // Prepare submission for AEM Form Service (wraps data in a 'data' key)
       try {
         const postResp = await fetch(actionUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: payload }),
+          // The payload MUST be wrapped in a "data" object
+          body: JSON.stringify({ data }),
         });
 
         if (postResp.ok) {
-          alert('Success! Student details saved.');
+          alert('Success! Data saved to the incoming sheet.');
           form.reset();
         } else {
-          throw new Error('Submission failed');
+          const errorText = await postResp.text();
+          console.error('Submission Error Details:', errorText);
+          alert('Submission failed. Check Console (F12) for details.');
         }
       } catch (err) {
-        alert('Error submitting form. Ensure the sheet is published.');
-        console.error(err);
+        console.error('Fetch Error:', err);
+        alert('Network error. Check if you are logged into the Sidekick.');
       }
     });
 
-    // 6. Replace block content with the new form
     block.textContent = '';
     block.append(form);
-
   } catch (error) {
-    block.textContent = 'Error: Could not load the student form.';
-    console.error(error);
+    console.error('Block Decoration Error:', error);
   }
 }

@@ -1,0 +1,27 @@
+version: 1
+
+indices:
+  pages:
+    include:
+      - /**
+    exclude:
+      - /drafts/**
+    
+    target: /query-index.json
+
+    properties:
+      title:
+        select: head > title
+        value: textContent
+
+      description:
+        select: meta[name="description"]
+        value: content
+
+      image:
+        select: meta[property="og:image"]
+        value: content
+
+      path:
+        select: head > meta[property="og:url"]
+        value: content
