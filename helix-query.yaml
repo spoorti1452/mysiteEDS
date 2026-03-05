@@ -6,7 +6,6 @@ indices:
       - /**
     exclude:
       - /drafts/**
-    
     target: /query-index.json
 
     properties:
@@ -23,5 +22,5 @@ indices:
         value: content
 
       path:
-        select: head > meta[property="og:url"]
+        select: meta[property="og:url"]
         value: content
