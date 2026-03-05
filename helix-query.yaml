@@ -22,5 +22,5 @@ indices:
         value: content
 
       path:
-        select: meta[property="og:url"]
-        value: content
+        select: link[rel="canonical"]
+        value: href
